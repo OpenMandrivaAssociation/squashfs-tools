@@ -35,8 +35,8 @@ cp %{SOURCE1} %{SOURCE2} %{name}
 %make -C %{name} Sqlzma=. LzmaAlone=%{_libdir} LzmaC=%{_libdir}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-install -m 755 %{name}/mksquashfs -D $RPM_BUILD_ROOT%{_bindir}/mksquashfs
+rm -rf %{buildroot}
+install -m 755 %{name}/mksquashfs -D %{buildroot}%{_bindir}/mksquashfs
 
 %clean
 rm -rf %{buildroot}
@@ -45,5 +45,3 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc ACKNOWLEDGEMENTS CHANGES README
 %{_bindir}/mksquashfs
-
-
