@@ -1,6 +1,6 @@
 %define sqname	squashfs
 %define sqver	3.3
-#%define sqrelease
+%undefine sqrelease
 %define rel 1
 %define release	%mkrel %{?sqrelease:1.%{sqrelease}.}%{rel}
 %define distname %{sqname}%{sqver}%{?sqrelease:-%{sqrelease}}
