@@ -1,7 +1,9 @@
 %define sqname	squashfs
-%define sqver	3.2
-%define sqrelease r2
-%define release	%mkrel 1.%{sqrelease}.2
+%define sqver	3.3
+#%define sqrelease
+%define rel 1
+%define release	%mkrel %{?sqrelease:1.%{sqrelease}.}rel
+%define distname %{sqname}%{sqver}%{?sqrelease:-%{sqrelease}}
 %define	Summary	Utilities for the creation of compressed squashfs images
 
 Name:		%{sqname}-tools
@@ -11,11 +13,11 @@ Summary:	%{Summary}
 License:	GPL
 Group:		File tools
 URL:		http://squashfs.sourceforge.net/
-Source0:	%{sqname}%{sqver}-%{sqrelease}.tar.bz2
+Source0:	%{distname}.tgz
 Source1:	sqlzma.h
 Source2:	sqmagic.h
-Patch0:		sqlzma2u-3.2-r2.patch
-Patch1:		squashfs3.2-r2-nolzma.patch
+Patch0:		sqlzma2u-3.3.patch
+Patch1:		squashfs3.3-nolzma.patch
 BuildRequires:	lzma-devel
 BuildRequires:	zlib-devel
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -24,7 +26,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %{Summary}
 
 %prep
-%setup -q -n %{sqname}%{sqver}-%{sqrelease}
+%setup -q -n %{distname}
 %patch0 -p1 -b .lzma
 %patch1 -p1 -b .nolzma
 cp %{SOURCE1} %{SOURCE2} %{name}
