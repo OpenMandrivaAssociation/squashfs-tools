@@ -1,7 +1,7 @@
 %define sqname	squashfs
 %define sqver	3.3
 %undefine sqrelease
-%define rel 2
+%define rel 3
 %define release	%mkrel %{?sqrelease:1.%{sqrelease}.}%{rel}
 %define distname %{sqname}%{sqver}%{?sqrelease:-%{sqrelease}}
 %define	Summary	Utilities for the creation of compressed squashfs images
@@ -36,7 +36,8 @@ cp %{SOURCE1} %{SOURCE2} %{name}
 
 %install
 rm -rf %{buildroot}
-install -m 755 %{name}/mksquashfs -D %{buildroot}%{_bindir}/mksquashfs
+install -d %{buildroot}%{_bindir}
+install -m 755 %{name}/mksquashfs %{name}/unsquashfs %{buildroot}%{_bindir}
 
 %clean
 rm -rf %{buildroot}
@@ -45,3 +46,4 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc ACKNOWLEDGEMENTS CHANGES README
 %{_bindir}/mksquashfs
+%{_bindir}/unsquashfs
