@@ -1,7 +1,7 @@
 %define sqname	squashfs
 %define sqver	3.3
 %undefine sqrelease
-%define rel 3
+%define rel 4
 %define release	%mkrel %{?sqrelease:1.%{sqrelease}.}%{rel}
 %define distname %{sqname}%{sqver}%{?sqrelease:-%{sqrelease}}
 %define	Summary	Utilities for the creation of compressed squashfs images
@@ -18,6 +18,8 @@ Source1:	sqlzma.h
 Source2:	sqmagic.h
 Patch0:		sqlzma2u-3.3.patch
 Patch1:		squashfs3.3-nolzma.patch
+# from CVS, fix hang when dealing with sparse files
+Patch2:		squashfs3.3-sparse.patch
 BuildRequires:	lzma-devel
 BuildRequires:	zlib-devel
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -29,6 +31,7 @@ squashfs-tools are utilities for the creation of compressed squashfs images.
 %setup -q -n %{distname}
 %patch0 -p1 -b .lzma
 %patch1 -p1 -b .nolzma
+%patch2 -p0 -b .sparse
 cp %{SOURCE1} %{SOURCE2} %{name}
 
 %build
