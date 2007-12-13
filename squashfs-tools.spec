@@ -23,7 +23,7 @@ BuildRequires:	zlib-devel
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
-%{Summary}
+squashfs-tools are utilities for the creation of compressed squashfs images.
 
 %prep
 %setup -q -n %{distname}
