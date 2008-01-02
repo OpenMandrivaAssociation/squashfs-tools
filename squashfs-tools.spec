@@ -22,6 +22,7 @@ Patch1:		squashfs3.3-nolzma.patch
 Patch2:		squashfs3.3-sparse.patch
 BuildRequires:	lzma-devel
 BuildRequires:	zlib-devel
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 squashfs-tools are utilities for the creation of compressed squashfs images.
