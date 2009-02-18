@@ -13,6 +13,7 @@ Group:		File tools
 URL:		http://squashfs.sourceforge.net/
 Source0:	%{sqname}-%{cvsdate}.tar.bz2
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRequires:	zlib-devel
 
 %description
 squashfs-tools are utilities for the creation of compressed squashfs images.
