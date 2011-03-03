@@ -1,7 +1,6 @@
 %define sqname	squashfs
 %define sqver	4.2
-%define cvsdate 20101231
-%define release	%mkrel 0.%{cvsdate}.1
+%define release	%mkrel 1
 %define	Summary	Utilities for the creation of compressed squashfs images
 
 Name:		%{sqname}-tools
@@ -11,7 +10,7 @@ Summary:	%{Summary}
 License:	GPL
 Group:		File tools
 URL:		http://squashfs.sourceforge.net/
-Source0:	%{sqname}-%{sqver}-cvs%{cvsdate}.tar.xz
+Source0:	%{sqname}%{sqver}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires:	zlib-devel attr-devel lzma-devel
 
@@ -19,7 +18,7 @@ BuildRequires:	zlib-devel attr-devel lzma-devel
 squashfs-tools are utilities for the creation of compressed squashfs images.
 
 %prep
-%setup -q -n %{sqname}-%{sqver}-cvs%{cvsdate}
+%setup -q -n %{sqname}%{sqver}
 
 %build
 cd squashfs-tools
