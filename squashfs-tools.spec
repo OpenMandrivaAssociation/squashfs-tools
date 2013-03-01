@@ -1,6 +1,6 @@
 %define sqname	squashfs
 %define sqver	4.2
-%define release	%mkrel 4
+%define release	5
 %define	Summary	Utilities for the creation of compressed squashfs images
 
 Name:		%{sqname}-tools
@@ -11,7 +11,6 @@ License:	GPL
 Group:		File tools
 URL:		http://squashfs.sourceforge.net/
 Source0:	%{sqname}%{sqver}.tar.gz
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires:	zlib-devel attr-devel lzma-devel
 
 %description
@@ -22,16 +21,15 @@ squashfs-tools are utilities for the creation of compressed squashfs images.
 
 %build
 cd squashfs-tools
-%make XZ_SUPPORT=1 COMP_DEFAULT=xz
+# Using BFD ld is a workaround for mksquashfs and unsquashfs getting the
+# same build ID with gold
+%make XZ_SUPPORT=1 COMP_DEFAULT=xz EXTRA_CFLAGS="%optflags -fuse-ld=bfd"
 
 %install
 rm -rf %{buildroot}
 install -d %{buildroot}%{_bindir}
 cd squashfs-tools
 install -m 755 mksquashfs unsquashfs %{buildroot}%{_bindir}
-
-%clean
-rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
