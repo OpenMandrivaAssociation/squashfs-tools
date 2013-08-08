@@ -3,7 +3,7 @@
 %define	sqname	squashfs
 Name:		%{sqname}-tools
 Version:	4.2
-Release:	7
+Release:	7.1
 Summary:	Utilities for the creation of compressed squashfs images
 License:	GPLv2+
 Group:		File tools
