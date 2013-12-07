@@ -3,7 +3,7 @@
 Summary:	Utilities for the creation of compressed squashfs images
 Name:		%{oname}-tools
 Version:	4.2
-Release:	7
+Release:	8
 License:	GPL
 Group:		File tools
 URL:		http://squashfs.sourceforge.net/
