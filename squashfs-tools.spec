@@ -6,8 +6,8 @@ Version:	4.2
 Release:	11
 License:	GPL
 Group:		File tools
-URL:		http://squashfs.sourceforge.net/
-Source0:	http://downloads.sourceforge.net/project/squashfs/squashfs/squashfs%{version}/%{oname}%{version).tar.gz
+URL:		http://squashfs.sourceforge.net
+Source0:	http://downloads.sourceforge.net/project/squashfs/squashfs/squashfs%{version}/%{oname}%{version}.tar.gz
 Patch0:		buffer-issue.patch
 Patch1:		path-issue.patch
 BuildRequires:	zlib-devel
@@ -15,7 +15,8 @@ BuildRequires:	attr-devel
 BuildRequires:	lzma-devel
 
 %description
-squashfs-tools are utilities for the creation of compressed squashfs images.
+squashfs-tools are utilities for the creation
+of compressed squashfs images.
 
 %prep
 %setup -q -n %{oname}%{version}
@@ -35,7 +36,5 @@ cd squashfs-tools
 install -m 755 mksquashfs unsquashfs %{buildroot}%{_bindir}
 
 %files
-#%doc README
 %{_bindir}/mksquashfs
 %{_bindir}/unsquashfs
-
