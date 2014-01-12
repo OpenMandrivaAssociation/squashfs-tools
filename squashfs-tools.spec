@@ -1,6 +1,6 @@
 %define sqname	squashfs
 %define sqver	4.2
-%define release	6
+%define release	7
 %define	Summary	Utilities for the creation of compressed squashfs images
 
 Name:		%{sqname}-tools
