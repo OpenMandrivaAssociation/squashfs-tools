@@ -1,14 +1,14 @@
 %bcond_without	uclibc
 
-%define	sqname	squashfs
-Name:		%{sqname}-tools
+%define	oname	squashfs
+Name:		%{oname}-tools
 Version:	4.2
-Release:	7.1
+Release:	12
 Summary:	Utilities for the creation of compressed squashfs images
 License:	GPLv2+
 Group:		File tools
 URL:		http://squashfs.sourceforge.net/
-Source0:	%{sqname}%{version}.tar.gz
+Source0:	http://downloads.sourceforge.net/project/squashfs/squashfs/squashfs%{version}/%{oname}%{version}.tar.gz
 Patch0:		buffer-issue.patch
 Patch1:		path-issue.patch
 BuildRequires:	pkgconfig(zlib) attr-devel pkgconfig(liblzma)
@@ -17,7 +17,8 @@ BuildRequires:	uClibc-devel
 %endif
 
 %description
-squashfs-tools are utilities for the creation of compressed squashfs images.
+squashfs-tools are utilities for the creation
+of compressed squashfs images.
 
 %package -n	uclibc-%{name}
 Summary:	Utilities for the creation of compressed squashfs images (uClibc build)
@@ -27,7 +28,7 @@ Group:		Networking/File transfer
 squashfs-tools are utilities for the creation of compressed squashfs images.
 
 %prep
-%setup -q -n %{sqname}%{version}
+%setup -q -n %{oname}%{version}
 %patch0 -p0
 %patch1 -p1
 
@@ -43,6 +44,7 @@ pushd .uclibc/squashfs-tools
 popd
 %endif
 
+%setup_compile_flags
 cd squashfs-tools
 # Using BFD ld is a workaround for mksquashfs and unsquashfs getting the
 # same build ID with gold
