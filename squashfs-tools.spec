@@ -1,9 +1,9 @@
-%bcond_without	uclibc
+%bcond_without uclibc
 
-%define	oname	squashfs
+%define	oname squashfs
 Name:		%{oname}-tools
-Version:	4.2
-Release:	12
+Version:	4.3
+Release:	1
 Summary:	Utilities for the creation of compressed squashfs images
 License:	GPLv2+
 Group:		File tools
@@ -11,7 +11,9 @@ URL:		http://squashfs.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/project/squashfs/squashfs/squashfs%{version}/%{oname}%{version}.tar.gz
 Patch0:		buffer-issue.patch
 Patch1:		path-issue.patch
-BuildRequires:	pkgconfig(zlib) attr-devel pkgconfig(liblzma)
+BuildRequires:	pkgconfig(zlib)
+BuildRequires:	attr-devel
+BuildRequires:	pkgconfig(liblzma)
 %if %{with uclibc}
 BuildRequires:	uClibc-devel
 %endif
@@ -22,7 +24,7 @@ of compressed squashfs images.
 
 %package -n	uclibc-%{name}
 Summary:	Utilities for the creation of compressed squashfs images (uClibc build)
-Group:		Networking/File transfer
+Group:		File tools
 
 %description -n	uclibc-%{name}
 squashfs-tools are utilities for the creation of compressed squashfs images.
