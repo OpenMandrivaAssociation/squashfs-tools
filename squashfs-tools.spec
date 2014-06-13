@@ -3,7 +3,7 @@
 %define	oname squashfs
 Name:		%{oname}-tools
 Version:	4.3
-Release:	1
+Release:	2
 Summary:	Utilities for the creation of compressed squashfs images
 License:	GPLv2+
 Group:		File tools
