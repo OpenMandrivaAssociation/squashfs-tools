@@ -9,8 +9,14 @@ License:	GPLv2+
 Group:		File tools
 URL:		http://squashfs.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/project/squashfs/squashfs/squashfs%{version}/%{oname}%{version}.tar.gz
-Patch0:		buffer-issue.patch
-Patch1:		path-issue.patch
+#Patch0:		buffer-issue.patch
+#Patch1:		path-issue.patch
+# From master branch (55f7ba830d40d438f0b0663a505e0c227fc68b6b).
+# 32 bit process can use too much memory when using PAE or 64 bit kernels
+Patch0:		PAE.patch
+# From master branch (604b607d8ac91eb8afc0b6e3d917d5c073096103).
+# Prevent overflows when using the -mem option.
+Patch1:		mem-overflow.patch
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:	attr-devel
 BuildRequires:	pkgconfig(liblzma)
@@ -31,8 +37,7 @@ squashfs-tools are utilities for the creation of compressed squashfs images.
 
 %prep
 %setup -q -n %{oname}%{version}
-%patch0 -p0
-%patch1 -p1
+%apply_patches
 
 %if %{with uclibc}
 mkdir .uclibc
