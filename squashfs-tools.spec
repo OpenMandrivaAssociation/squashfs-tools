@@ -1,6 +1,8 @@
 %bcond_without uclibc
 
 %define	oname squashfs
+%define _disable_ld_no_undefined 1
+
 Name:		%{oname}-tools
 Version:	4.3
 Release:	3
@@ -45,6 +47,8 @@ cp -a * .uclibc
 %endif
 
 %build
+%setup_compile_flags
+
 %if %{with uclibc}
 pushd .uclibc/squashfs-tools
 %make CC=%{uclibc_cc} XZ_SUPPORT=1 COMP_DEFAULT=xz EXTRA_CFLAGS="%{uclibc_cflags} -fuse-ld=bfd"
