@@ -23,7 +23,7 @@ Patch2:  2gb.patch
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:	attr-devel
 BuildRequires:	pkgconfig(liblzma)
-#BuildRequires:	lz4-devel
+BuildRequires:	lz4-devel
 BuildRequires:	lzo-devel
 %if %{with uclibc}
 BuildRequires:	uClibc-devel
@@ -44,7 +44,9 @@ squashfs-tools are utilities for the creation of compressed squashfs images.
 
 %prep
 %setup -q -n %{oname}%{version}
-%apply_patches
+%patch0 -p1
+%patch1 -p1
+%patch2 -p0
 
 %if %{with uclibc}
 mkdir .uclibc
@@ -64,7 +66,7 @@ popd
 cd squashfs-tools
 # Using BFD ld is a workaround for mksquashfs and unsquashfs getting the
 # same build ID with gold
-%make -j1 XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=0 COMP_DEFAULT=xz EXTRA_CFLAGS="%{optflags} -fuse-ld=bfd"
+%make -j1 XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=1 COMP_DEFAULT=xz EXTRA_CFLAGS="%{optflags} -fuse-ld=bfd"
 
 %install
 %if %{with uclibc}
