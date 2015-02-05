@@ -62,11 +62,10 @@ pushd .uclibc/squashfs-tools
 popd
 %endif
 
-%setup_compile_flags
 cd squashfs-tools
 # Using BFD ld is a workaround for mksquashfs and unsquashfs getting the
 # same build ID with gold
-%make -j1 XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=1 COMP_DEFAULT=xz EXTRA_CFLAGS="%{optflags} -fuse-ld=bfd"
+%make -j1 XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=1 COMP_DEFAULT=xz EXTRA_CFLAGS="%{optflags}"
 
 %install
 %if %{with uclibc}
