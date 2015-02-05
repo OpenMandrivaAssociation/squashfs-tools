@@ -55,10 +55,12 @@ cp -a * .uclibc
 
 %build
 %setup_compile_flags
+export CC=gcc
+export CXX=g++
 
 %if %{with uclibc}
 pushd .uclibc/squashfs-tools
-%make CC=%{uclibc_cc} XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=0 COMP_DEFAULT=xz EXTRA_CFLAGS="%{uclibc_cflags} -fuse-ld=bfd"
+%make CC=%{uclibc_cc} XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=0 COMP_DEFAULT=xz EXTRA_CFLAGS="%{uclibc_cflags}"
 popd
 %endif
 
