@@ -23,7 +23,7 @@ Patch2:  2gb.patch
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:	attr-devel
 BuildRequires:	pkgconfig(liblzma)
-BuildRequires:	lz4-devel
+BuildRequires:	pkgconfig(liblz4)
 BuildRequires:	lzo-devel
 %if %{with uclibc}
 BuildRequires:	uClibc-devel
