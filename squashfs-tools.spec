@@ -1,11 +1,11 @@
-%bcond_without uclibc
+%bcond_with uclibc
 
 %define	oname squashfs
 %define _disable_ld_no_undefined 1
 
 Name:		%{oname}-tools
 Version:	4.3
-Release:	6
+Release:	7
 Summary:	Utilities for the creation of compressed squashfs images
 License:	GPLv2+
 Group:		File tools
