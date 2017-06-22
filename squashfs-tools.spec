@@ -3,7 +3,7 @@
 
 Name:		%{oname}-tools
 Version:	4.3
-Release:	8
+Release:	9
 Summary:	Utilities for the creation of compressed squashfs images
 License:	GPLv2+
 Group:		File tools
@@ -17,12 +17,17 @@ Patch0:		PAE.patch
 Patch1:		mem-overflow.patch
 # From squashfs-devel@lists.sourceforge.net by Guan Xin <guanx.bac@gmail.com>
 # For https://bugzilla.redhat.com/show_bug.cgi?id=1141206
-Patch2:  2gb.patch
+Patch2:		2gb.patch
+# (tpg) add zstd support
+# https://github.com/iburinoc/squashfs-tools/tree/zstd
+Patch3:		0000-Add-Zstandard-support.patch
+Patch4:		0001-Add-patch-for-GENERIC-instead-of-dstSize_tooSmall-bu.patch
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:	attr-devel
 BuildRequires:	pkgconfig(liblzma)
 BuildRequires:	pkgconfig(liblz4)
 BuildRequires:	lzo-devel
+BuildRequires:	pkgconfig(libzstd)
 
 %description
 squashfs-tools are utilities for the creation
@@ -33,6 +38,8 @@ of compressed squashfs images.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p0
+%patch3 -p1
+%patch4 -p1
 
 %build
 %setup_compile_flags
@@ -42,7 +49,7 @@ of compressed squashfs images.
 cd squashfs-tools
 # Using BFD ld is a workaround for mksquashfs and unsquashfs getting the
 # same build ID with gold
-%make -j1 XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=1 COMP_DEFAULT=xz EXTRA_CFLAGS="%{optflags}"
+%make -j1 ZSTD_SUPPORT=1 XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=1 COMP_DEFAULT=xz EXTRA_CFLAGS="%{optflags}"
 
 %install
 install -m755 squashfs-tools/mksquashfs -D %{buildroot}%{_bindir}/mksquashfs
@@ -52,4 +59,3 @@ install -m755 squashfs-tools/unsquashfs -D %{buildroot}%{_bindir}/unsquashfs
 %doc README
 %{_bindir}/mksquashfs
 %{_bindir}/unsquashfs
-
