@@ -1,0 +1,39 @@
+From 05ec5ff31a59f95d8267d6b4d7f662f5134eeb36 Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Sun, 6 Jul 2014 03:33:17 +0100
+Subject: [PATCH 006/120] actions: deal with the unlikely case readlink returns
+ 0 bytes
+
+This should never happen, but, it's easy to adjust the error check
+to deal with it, so why not ...
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/action.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/squashfs-tools/action.c b/squashfs-tools/action.c
+index d1fba41..85573f3 100644
+--- a/squashfs-tools/action.c
++++ b/squashfs-tools/action.c
+@@ -2270,7 +2270,7 @@ static int absolute_fn(struct atom *atom, struct action_data *action_data)
+ 		return 0;
+ 
+ 	bytes = readlink(action_data->pathname, buff, 1);
+-	if(bytes == -1)
++	if(bytes < 1)
+ 		/* reading symlink failed, this will be flagged up and dealt
+ 		 * with later in Mksquashfs, and so here just return FALSE */
+ 		return 0;
+@@ -2304,7 +2304,7 @@ static int contained_fn(struct atom *atom, struct action_data *action_data)
+ 		return 1;
+ 
+ 	bytes = readlink(action_data->pathname, s, 65536);
+-	if(bytes == -1 || bytes == 65536)
++	if(bytes < 1 || bytes == 65536)
+ 		/* reading symlink failed or (unlikely) the symlink was longer
+ 		 * than the implementation limit. This will be flagged up and
+ 		 * dealt with later in Mksquashfs, and so here just return
+-- 
+2.8.3
+

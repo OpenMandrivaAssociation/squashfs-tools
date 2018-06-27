@@ -1,0 +1,37 @@
+From 6b5d455697dab175e7131e6cf9d2fe656c85d997 Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Mon, 4 Aug 2014 04:43:15 +0100
+Subject: [PATCH 029/120] mksquashfs: fix dir_scan5() -- empty prune action
+
+Dir_scan5() did not check for root entries (entries in the root
+directory read from the original filesystem in append mode).
+
+These entries are not "real" entries in that they cannot be evaluated
+for emptiness.  The entries only exist in the original filesystem
+amd must be skipped.
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/mksquashfs.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index ba3646c..321726f 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -3686,6 +3686,12 @@ void dir_scan5(struct dir_info *dir)
+ 	struct dir_ent *dir_ent = dir->list, *prev = NULL;
+ 
+ 	while(dir_ent) {
++		if(dir_ent->inode->root_entry) {
++			prev = dir_ent;
++			dir_ent = dir_ent->next;
++			continue;
++		}
++
+ 		if((dir_ent->inode->buf.st_mode & S_IFMT) == S_IFDIR) {
+ 			dir_scan5(dir_ent->dir);
+ 
+-- 
+2.8.3
+

@@ -1,0 +1,26 @@
+From 29a07ff0a0b53af1d6fb7f900630547042ea26b0 Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Mon, 13 Mar 2017 07:28:19 +0000
+Subject: [PATCH 113/120] pseudo: Add missing line termination in ERROR()
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/pseudo.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/squashfs-tools/pseudo.c b/squashfs-tools/pseudo.c
+index f9bb90a..0f15ebe 100644
+--- a/squashfs-tools/pseudo.c
++++ b/squashfs-tools/pseudo.c
+@@ -398,7 +398,7 @@ int read_pseudo_def(char *def)
+ 
+ 		if(strlen(def) > 65535) {
+ 			ERROR("Symlink pseudo definition %s is greater than 65535"
+-								" bytes!", def);
++								" bytes!\n", def);
+ 			goto error;
+ 		}
+ 		break;
+-- 
+2.8.3
+

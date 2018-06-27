@@ -1,0 +1,36 @@
+From 95140b96545de5e1cbe88a5316bdc41cfab717ed Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Wed, 27 Aug 2014 05:40:39 +0100
+Subject: [PATCH 070/120] action: update action option parsing to use
+ ACTION_LOG_{NONE|VERBOSE}
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/mksquashfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index d242987..37d9203 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -5193,7 +5193,7 @@ int main(int argc, char *argv[])
+ 					argv[0], argv[i - 1]);
+ 				exit(1);
+ 			}
+-			res = parse_action(argv[i], 0);
++			res = parse_action(argv[i], ACTION_LOG_NONE);
+ 			if(res == 0)
+ 				exit(1);
+ 
+@@ -5204,7 +5204,7 @@ int main(int argc, char *argv[])
+ 					argv[0], argv[i - 1]);
+ 				exit(1);
+ 			}
+-			res = parse_action(argv[i], 1);
++			res = parse_action(argv[i], ACTION_LOG_VERBOSE);
+ 			if(res == 0)
+ 				exit(1);
+ 
+-- 
+2.8.3
+

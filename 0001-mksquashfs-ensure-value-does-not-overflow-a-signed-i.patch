@@ -1,10 +1,13 @@
 From 604b607d8ac91eb8afc0b6e3d917d5c073096103 Mon Sep 17 00:00:00 2001
 From: Phillip Lougher <phillip@squashfs.org.uk>
 Date: Wed, 11 Jun 2014 04:51:37 +0100
-Subject: mksquashfs: ensure value does not overflow a signed int in -mem
- option
+Subject: [PATCH 001/120] mksquashfs: ensure value does not overflow a signed
+ int in -mem option
 
 Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/mksquashfs.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
 index 5370ecf..9676dc8 100644
@@ -29,5 +32,5 @@ index 5370ecf..9676dc8 100644
  			if(total_mem < (SQUASHFS_LOWMEM / SQUASHFS_TAKE)) {
  				ERROR("%s: -mem should be %d Mbytes or "
 -- 
-cgit v0.10.1
+2.8.3
 

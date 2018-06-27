@@ -1,0 +1,70 @@
+From 4ec4a8e70a708d141d271f03511ce3c4ad561d04 Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Tue, 18 Jul 2017 05:09:37 +0100
+Subject: [PATCH 116/120] Pseudo: improve the error message when filenames with
+ spaces are used
+
+If someone used filenames with spaces but didn't backslash
+the spaces (or use the new support for quoted filenames), then they'd
+get the less than illuminating error message
+
+"Read filename and type, but failed to read or match octal mode"
+
+Because the code would treat the filename before the first space
+as the filename, match the type using the first character after
+the space, and only then fail to parse the expected octal number.
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/mksquashfs.c |  4 ++--
+ squashfs-tools/pseudo.c     | 11 +++++------
+ 2 files changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index d36de17..dae0f01 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -5103,8 +5103,8 @@ void calculate_queue_sizes(int mem, int *readq, int *fragq, int *bwriteq,
+ 
+ 
+ #define VERSION() \
+-	printf("mksquashfs version 4.3-git (2014/09/12)\n");\
+-	printf("copyright (C) 2014 Phillip Lougher "\
++	printf("mksquashfs version 4.3-git (2017/07/18)\n");\
++	printf("copyright (C) 2017 Phillip Lougher "\
+ 		"<phillip@squashfs.org.uk>\n\n"); \
+ 	printf("This program is free software; you can redistribute it and/or"\
+ 		"\n");\
+diff --git a/squashfs-tools/pseudo.c b/squashfs-tools/pseudo.c
+index 95635cb..a3aebb5 100644
+--- a/squashfs-tools/pseudo.c
++++ b/squashfs-tools/pseudo.c
+@@ -327,12 +327,11 @@ int read_pseudo_def(char *def)
+ 		case -1:
+ 			/* FALLTHROUGH */
+ 		case 0:
+-			ERROR("Read filename, but failed to read or match "
+-				"type\n");
+-			break;
++			/* FALLTHROUGH */
+ 		case 1:
+-			ERROR("Read filename and type, but failed to read or "
+-				"match octal mode\n");
++			ERROR("Couldn't parse filename, type or octal mode\n");
++			ERROR("If the filename has spaces, either quote it, or "
++				"backslash the spaces\n");
+ 			break;
+ 		case 2:
+ 			ERROR("Read filename, type and mode, but failed to "
+@@ -502,7 +501,7 @@ error:
+ 	ERROR("\tfilename m mode uid gid\n");
+ 	ERROR("\tfilename b mode uid gid major minor\n");
+ 	ERROR("\tfilename c mode uid gid major minor\n");
+-	ERROR("\tfilename f mode uid command\n");
++	ERROR("\tfilename f mode uid gid command\n");
+ 	ERROR("\tfilename s mode uid gid symlink\n");
+ 	free(filename);
+ 	return FALSE;
+-- 
+2.8.3
+

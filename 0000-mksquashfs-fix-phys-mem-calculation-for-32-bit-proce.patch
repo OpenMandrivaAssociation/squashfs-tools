@@ -1,8 +1,8 @@
 From 55f7ba830d40d438f0b0663a505e0c227fc68b6b Mon Sep 17 00:00:00 2001
 From: Phillip Lougher <phillip@squashfs.org.uk>
 Date: Tue, 10 Jun 2014 21:51:52 +0100
-Subject: mksquashfs: fix phys mem calculation for 32-bit processes on
- PAE/64-bit kernels
+Subject: [PATCH 000/120] mksquashfs: fix phys mem calculation for 32-bit
+ processes on PAE/64-bit kernels
 
 When adding the code to base default memory usage on physical memory
 (by default use 25% of physical memory), I made an oversight.  I assumed
@@ -36,6 +36,9 @@ may only be able to address 2 GB.  In the process I've also taken the
 opportunity to limit all requests to no more than 75% of physical memory.
 
 Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/mksquashfs.c | 78 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 70 insertions(+), 8 deletions(-)
 
 diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
 index 86f82bb..5370ecf 100644
@@ -155,5 +158,5 @@ index 86f82bb..5370ecf 100644
  	int force_progress = FALSE;
  	struct file_buffer **fragment = NULL;
 -- 
-cgit v0.10.1
+2.8.3
 

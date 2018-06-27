@@ -1,0 +1,31 @@
+From c40908f87cbaa9b4ee5cc9bfb0543f50250643c0 Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Mon, 4 Aug 2014 01:52:17 +0100
+Subject: [PATCH 027/120] action: add comment describing generic TEST_VAR_FN
+ macros
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/action.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/squashfs-tools/action.c b/squashfs-tools/action.c
+index 9d62f82..60d3226 100644
+--- a/squashfs-tools/action.c
++++ b/squashfs-tools/action.c
+@@ -2030,6 +2030,12 @@ static int subpathname_fn(struct atom *atom, struct action_data *action_data)
+ 		FNM_PATHNAME|FNM_PERIOD|FNM_EXTMATCH) == 0;
+ }
+ 
++/*
++ * Inode attribute test operations using generic
++ * TEST_VAR_FN(test name, file scope, attribute name) macro.
++ * This is for tests that do not need to be specially handled in any way.
++ * They just take a variable and compare it against a number.
++ */
+ TEST_VAR_FN(filesize, ACTION_REG, action_data->buf->st_size)
+ 
+ TEST_VAR_FN(dirsize, ACTION_DIR, action_data->buf->st_size)
+-- 
+2.8.3
+

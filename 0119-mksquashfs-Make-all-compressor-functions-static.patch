@@ -1,0 +1,107 @@
+From aa75ccd1c03c1cba282be6adce2bce5c09f9a578 Mon Sep 17 00:00:00 2001
+From: Nick Terrell <terrelln@fb.com>
+Date: Wed, 9 Aug 2017 12:59:16 -0700
+Subject: [PATCH 119/120] mksquashfs: Make all compressor functions static
+
+Make these functions static, since they are only exposed through the
+compressor struct.
+
+Signed-off-by: Nick Terrell <terrelln@fb.com>
+---
+ squashfs-tools/gzip_wrapper.c | 4 ++--
+ squashfs-tools/lz4_wrapper.c  | 4 ++--
+ squashfs-tools/lzo_wrapper.c  | 4 ++--
+ squashfs-tools/xz_wrapper.c   | 4 ++--
+ 4 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/squashfs-tools/gzip_wrapper.c b/squashfs-tools/gzip_wrapper.c
+index 076a587..ac32bb9 100644
+--- a/squashfs-tools/gzip_wrapper.c
++++ b/squashfs-tools/gzip_wrapper.c
+@@ -276,7 +276,7 @@ failed:
+ }
+ 
+ 
+-void gzip_display_options(void *buffer, int size)
++static void gzip_display_options(void *buffer, int size)
+ {
+ 	struct gzip_comp_opts *comp_opts = buffer;
+ 	int i, printed;
+@@ -467,7 +467,7 @@ static int gzip_uncompress(void *d, void *s, int size, int outsize, int *error)
+ }
+ 
+ 
+-void gzip_usage()
++static void gzip_usage()
+ {
+ 	fprintf(stderr, "\t  -Xcompression-level <compression-level>\n");
+ 	fprintf(stderr, "\t\t<compression-level> should be 1 .. 9 (default "
+diff --git a/squashfs-tools/lz4_wrapper.c b/squashfs-tools/lz4_wrapper.c
+index b87cfe0..fce8382 100644
+--- a/squashfs-tools/lz4_wrapper.c
++++ b/squashfs-tools/lz4_wrapper.c
+@@ -184,7 +184,7 @@ failed:
+ }
+ 
+ 
+-void lz4_display_options(void *buffer, int size)
++static void lz4_display_options(void *buffer, int size)
+ {
+ 	struct lz4_comp_opts *comp_opts = buffer;
+ 
+@@ -261,7 +261,7 @@ static int lz4_uncompress(void *dest, void *src, int size, int outsize,
+ }
+ 
+ 
+-void lz4_usage()
++static void lz4_usage()
+ {
+ 	fprintf(stderr, "\t  -Xhc\n");
+ 	fprintf(stderr, "\t\tCompress using LZ4 High Compression\n");
+diff --git a/squashfs-tools/lzo_wrapper.c b/squashfs-tools/lzo_wrapper.c
+index 8c9bf95..f367fad 100644
+--- a/squashfs-tools/lzo_wrapper.c
++++ b/squashfs-tools/lzo_wrapper.c
+@@ -263,7 +263,7 @@ failed:
+ }
+ 
+ 
+-void lzo_display_options(void *buffer, int size)
++static void lzo_display_options(void *buffer, int size)
+ {
+ 	struct lzo_comp_opts *comp_opts = buffer;
+ 
+@@ -391,7 +391,7 @@ static int lzo_uncompress(void *dest, void *src, int size, int outsize,
+ }
+ 
+ 
+-void lzo_usage()
++static void lzo_usage()
+ {
+ 	int i;
+ 
+diff --git a/squashfs-tools/xz_wrapper.c b/squashfs-tools/xz_wrapper.c
+index e77ec59..0977f74 100644
+--- a/squashfs-tools/xz_wrapper.c
++++ b/squashfs-tools/xz_wrapper.c
+@@ -322,7 +322,7 @@ failed:
+ }
+ 
+ 
+-void xz_display_options(void *buffer, int size)
++static void xz_display_options(void *buffer, int size)
+ {
+ 	struct comp_opts *comp_opts = buffer;
+ 	int dictionary_size, flags, printed;
+@@ -503,7 +503,7 @@ static int xz_uncompress(void *dest, void *src, int size, int outsize,
+ }
+ 
+ 
+-void xz_usage()
++static void xz_usage()
+ {
+ 	fprintf(stderr, "\t  -Xbcj filter1,filter2,...,filterN\n");
+ 	fprintf(stderr, "\t\tCompress using filter1,filter2,...,filterN in");
+-- 
+2.8.3
+

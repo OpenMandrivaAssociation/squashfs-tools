@@ -1,0 +1,117 @@
+From c248232b6b7917739603a8f56f9a6b9b45c672d2 Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Mon, 23 Jun 2014 04:46:50 +0100
+Subject: [PATCH 005/120] actions: add new contained() test operator for
+ symbolic links
+
+Test if a symlink appears to be within the source filesystem,
+that is, it has a relative path, and the relative path does not
+appear to backtrack outside the source filesystem using "..".
+
+This test function does not evaluate the path for symlinks - this
+is deliberate, as this makes the test fast, but in the presence
+of symlinks in the path it can fail to identify paths which do go
+outside the sourcefilesystem.  If this circumstance may occur, then
+you should use contained_realpath(), which does follow symlinks,
+but which is hence a much more expensive test.
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/action.c     | 60 +++++++++++++++++++++++++++++++++++++++++++++
+ squashfs-tools/mksquashfs.c |  2 +-
+ 2 files changed, 61 insertions(+), 1 deletion(-)
+
+diff --git a/squashfs-tools/action.c b/squashfs-tools/action.c
+index 35f8374..d1fba41 100644
+--- a/squashfs-tools/action.c
++++ b/squashfs-tools/action.c
+@@ -2279,6 +2279,65 @@ static int absolute_fn(struct atom *atom, struct action_data *action_data)
+ }
+ 
+ 
++static int contained_fn(struct atom *atom, struct action_data *action_data)
++{
++	int bytes, depth = action_data->depth;
++	char buff[65536]; /* overflow safe */
++	char *p, *s = buff;
++
++	/*
++	 * Test if a symlink appears to be within the source filesystem,
++	 * that is, it has a relative path, and the relative path does not
++	 * appear to backtrack outside the source filesystem using "..".
++	 *
++	 * This test function does not evaluate the path for symlinks - this
++	 * is deliberate, as this makes the test fast, but in the presence
++	 * of symlinks in the path it can fail to identify paths which do go
++	 * outside the sourcefilesystem.  If this circumstance may occur, then
++	 * you should use contained_realpath(), which does follow symlinks,
++	 * but which is hence a much more expensive test.
++	 *
++	 * contained operates on symlinks only, other files by definition
++	 * are contained within the source filesystem.
++	 */
++	if (!(action_data->buf->st_mode & ACTION_LNK))
++		return 1;
++
++	bytes = readlink(action_data->pathname, s, 65536);
++	if(bytes == -1 || bytes == 65536)
++		/* reading symlink failed or (unlikely) the symlink was longer
++		 * than the implementation limit. This will be flagged up and
++		 * dealt with later in Mksquashfs, and so here just return
++		 * FALSE */
++		return 0;
++
++	if (s[0] == '/')
++		/* absolute symlinks are not contained within the source
++		 * filesystem */
++		return 0;
++
++	while(s != '\0' && depth) {
++		while(*s == '/')
++			s ++;
++
++		if(*s == '\0')
++			break;
++
++		for(p = s; *s != '\0' && *s != '/'; s ++);
++
++		if(strncmp(p, ".", s - p) == 0)
++			continue;
++
++		if(strncmp(p, "..", s - p) == 0)
++			depth --;
++		else
++			depth ++;
++	}
++
++	return depth;
++}
++
++
+ #ifdef SQUASHFS_TRACE
+ static void dump_parse_tree(struct expr *expr)
+ {
+@@ -2377,6 +2436,7 @@ static struct test_entry test_table[] = {
+ 	{ "exec", 1, exec_fn, NULL},
+ 	{ "exists", 0, exists_fn, NULL},
+ 	{ "absolute", 0, absolute_fn, NULL},
++	{ "contained", 0, contained_fn, NULL},
+ 	{ "", -1 }
+ };
+ 
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index 87bebee..c33841c 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -4976,7 +4976,7 @@ void calculate_queue_sizes(int mem, int *readq, int *fragq, int *bwriteq,
+ 
+ 
+ #define VERSION() \
+-	printf("mksquashfs version 4.3-git (2014/06/21)\n");\
++	printf("mksquashfs version 4.3-git (2014/06/22)\n");\
+ 	printf("copyright (C) 2014 Phillip Lougher "\
+ 		"<phillip@squashfs.org.uk>\n\n"); \
+ 	printf("This program is free software; you can redistribute it and/or"\
+-- 
+2.8.3
+

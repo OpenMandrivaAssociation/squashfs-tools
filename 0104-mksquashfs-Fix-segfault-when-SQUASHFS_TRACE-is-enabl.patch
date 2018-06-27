@@ -1,0 +1,31 @@
+From c1d1ca267668eeb347bf8376768a5631beeb0b2c Mon Sep 17 00:00:00 2001
+From: Mohamad Ayyash <mkayyash@google.com>
+Date: Wed, 6 May 2015 14:05:06 -0700
+Subject: [PATCH 104/120] mksquashfs: Fix segfault when SQUASHFS_TRACE is
+ enabled and no -pf flag
+
+Segfault happens when attempting to dump pseudo files in SQUASHFS_TRACE
+mode after attempting to dereference NULL pseudo pointer.
+
+Signed-off-by: Mohamad Ayyash <mkayyash@google.com>
+---
+ squashfs-tools/pseudo.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/squashfs-tools/pseudo.c b/squashfs-tools/pseudo.c
+index cbd45c7..f446534 100644
+--- a/squashfs-tools/pseudo.c
++++ b/squashfs-tools/pseudo.c
+@@ -539,7 +539,8 @@ static void dump_pseudo(struct pseudo *pseudo, char *string)
+ 
+ void dump_pseudos()
+ {
+-	dump_pseudo(pseudo, NULL);
++    if (pseudo)
++        dump_pseudo(pseudo, NULL);
+ }
+ #else
+ void dump_pseudos()
+-- 
+2.8.3
+

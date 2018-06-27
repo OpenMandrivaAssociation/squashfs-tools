@@ -1,0 +1,63 @@
+From d8295a1c0b06b3fa2754e321bfb94a2063bac9a7 Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Wed, 10 Sep 2014 23:24:35 +0100
+Subject: [PATCH 096/120] action: change expression logging to use atom->args
+
+Previously it used atom->test->args which is the arg count in the "generic"
+test function.
+
+Now that test function parsing has been improved to add variable arguments,
+we should be using the new atom->args field which is the number of actual
+arguments in the particular parsed test - i.e. the instance rather than
+the definition.
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/action.c     | 8 ++++----
+ squashfs-tools/mksquashfs.c | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/squashfs-tools/action.c b/squashfs-tools/action.c
+index b70cd26..3dccde5 100644
+--- a/squashfs-tools/action.c
++++ b/squashfs-tools/action.c
+@@ -672,9 +672,9 @@ void expr_log_atom(struct atom *atom)
+ 
+ 	expr_log(atom->test->name);
+ 	expr_log("(");
+-	for(i = 0; i < atom->test->args; i++) {
++	for(i = 0; i < atom->args; i++) {
+ 		expr_log(atom->argv[i]);
+-		if (i + 1 < atom->test->args)
++		if (i + 1 < atom->args)
+ 			expr_log(",");
+ 	}
+ 	expr_log(")");
+@@ -3125,9 +3125,9 @@ static void dump_parse_tree(struct expr *expr)
+ 		int i;
+ 
+ 		printf("%s(", expr->atom.test->name);
+-		for(i = 0; i < expr->atom.test->args; i++) {
++		for(i = 0; i < expr->atom.args; i++) {
+ 			printf("%s", expr->atom.argv[i]);
+-			if (i + 1 < expr->atom.test->args)
++			if (i + 1 < expr->atom.args)
+ 				printf(",");
+ 		}
+ 		printf(")");
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index 6644c98..738bd7f 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -5089,7 +5089,7 @@ void calculate_queue_sizes(int mem, int *readq, int *fragq, int *bwriteq,
+ 
+ 
+ #define VERSION() \
+-	printf("mksquashfs version 4.3-git (2014/09/07)\n");\
++	printf("mksquashfs version 4.3-git (2014/09/10)\n");\
+ 	printf("copyright (C) 2014 Phillip Lougher "\
+ 		"<phillip@squashfs.org.uk>\n\n"); \
+ 	printf("This program is free software; you can redistribute it and/or"\
+-- 
+2.8.3
+

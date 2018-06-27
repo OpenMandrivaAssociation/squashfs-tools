@@ -1,0 +1,256 @@
+From b792207c0eb7fa9eb318d0ab04e516a46c91e84c Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Wed, 30 Jul 2014 06:01:42 +0100
+Subject: [PATCH 022/120] actions: get rid of contained and
+ contained_followlink
+
+They are now subsumed in the rewritten exists function.
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/action.c     | 208 --------------------------------------------
+ squashfs-tools/mksquashfs.c |   2 +-
+ 2 files changed, 1 insertion(+), 209 deletions(-)
+
+diff --git a/squashfs-tools/action.c b/squashfs-tools/action.c
+index 9c42213..7c10b54 100644
+--- a/squashfs-tools/action.c
++++ b/squashfs-tools/action.c
+@@ -2438,212 +2438,6 @@ static int absolute_fn(struct atom *atom, struct action_data *action_data)
+ }
+ 
+ 
+-static int contained_fn(struct atom *atom, struct action_data *action_data)
+-{
+-	int bytes, depth = action_data->depth;
+-	char buff[65536]; /* overflow safe */
+-	char *p, *s = buff;
+-
+-	/*
+-	 * Test if a symlink appears to be within the source filesystem,
+-	 * that is, it has a relative path, and the relative path does not
+-	 * appear to backtrack outside the source filesystem using "..".
+-	 *
+-	 * This test function does not evaluate the path for symlinks - this
+-	 * is deliberate, as this makes the test fast, but in the presence
+-	 * of symlinks in the path it can fail to identify paths which do go
+-	 * outside the sourcefilesystem.  If this circumstance may occur, then
+-	 * you should use contained_realpath(), which does follow symlinks,
+-	 * but which is hence a much more expensive test.
+-	 *
+-	 * contained operates on symlinks only, other files by definition
+-	 * are contained within the source filesystem.
+-	 */
+-	if (!file_type_match(action_data->buf->st_mode, ACTION_LNK))
+-		return 1;
+-
+-	/* if nonstandard_pathname is set, then this is a symlink entered on the
+-	 * command line, this by definition is a dangling symlink */
+-	if(action_data->dir_ent->nonstandard_pathname)
+-		return 0;
+-
+-	bytes = readlink(action_data->pathname, s, 65536);
+-	if(bytes < 1 || bytes == 65536)
+-		/* reading symlink failed or (unlikely) the symlink was longer
+-		 * than the implementation limit. This will be flagged up and
+-		 * dealt with later in Mksquashfs, and so here just return
+-		 * FALSE */
+-		return 0;
+-
+-	if (s[0] == '/')
+-		/* absolute symlinks are not contained within the source
+-		 * filesystem */
+-		return 0;
+-
+-	/* readlink doesn't 0 terminate the returned path */
+-	s[bytes] = '\0';
+-
+-	while(depth) {
+-		while(*s == '/')
+-			s ++;
+-
+-		if(*s == '\0')
+-			break;
+-
+-		for(p = s; *s != '\0' && *s != '/'; s ++);
+-
+-		if(strncmp(p, ".", s - p) == 0)
+-			continue;
+-
+-		if(strncmp(p, "..", s - p) == 0)
+-			depth --;
+-		else
+-			depth ++;
+-	}
+-
+-	return depth;
+-}
+-
+-
+-static int follow_link(char *pathname, char *symlink, int depth)
+-{
+-	int bytes;
+-	char buff[65536]; /* overflow safe */
+-	char *name, *p, *s = symlink;
+-	int pathname_size = strlen(pathname) + 1;
+-
+-	name = malloc(pathname_size + strlen(symlink) + 1);
+-	if(name == NULL)
+-			MEM_ERROR();
+-	strcat(strcpy(name, pathname), "/");
+-
+-	while(depth) {
+-		while(*s == '/')
+-			s ++;
+-
+-		if(*s == '\0')
+-			break;
+-
+-		for(p = s; *s != '\0' && *s != '/'; s ++);
+-
+-		if(strncmp(p, ".", s - p) == 0)
+-			continue;
+-
+-		if(strncmp(p, "..", s - p) == 0) {
+-			depth --;
+-			continue;
+-		}
+-
+-		/* Try to read the pathname component as a symlink */
+-		/* Compose pathname, pathname + "/" + symlink[0 .. s] */
+-		memcpy(name + pathname_size, symlink, s - symlink);
+-		name[pathname_size + s - symlink] = '\0';
+-
+-		bytes = readlink(name, buff, 65536);
+-		if(bytes == -1) {
+-			if(errno == EINVAL) {
+-				/* Not a symlink, continue processing */
+-				depth ++;
+-			} else {
+-				/* all other errors are treated as failure
+-				 * to resolve as contained within filesystem,
+-				 * this most likely indicates the symlink
+-				 * component doesn't exist or is unreadable in a
+-				 * another way */
+-				free(name);
+-				return 0;
+-			}
+-		} else if(bytes < 1 || bytes == 65536) {
+-			/* the symlink was longer than the implementation
+-			 * limit.  Treat as failure to resolve as contained
+-			 * within filesystem.  If this symlink is within the
+-			 * filesystem it will be flagged up and dealt with
+-			 * later in Mksquashfs, and so here just return
+-			 * FALSE */
+-			free(name);
+-			return 0;
+-		} else if (buff[0] == '/') {
+-			/* absolute symlinks are not contained within the source
+-			 * filesystem */
+-			free(name);
+-			return 0;
+-		} else {
+-			/* recursively process this symlink */
+-			/* readlink doesn't 0 terminate the returned path */
+-			buff[bytes] = '\0';
+-
+-			/* the symlink is relative to the parent directory */
+-			/* so just truncate previously computed path */
+-			name[pathname_size + p - symlink] = '\0';
+-			depth = follow_link(name, buff, depth);
+-		}
+-	}
+-
+-	return depth;
+-}
+-
+-
+-static int contained_followlink_fn(struct atom *atom,
+-				struct action_data *action_data)
+-{
+-	int bytes;
+-	char buff[65536]; /* overflow safe */
+-	char *parent;
+-
+-	/*
+-	 * Test if a symlink appears to be within the source filesystem,
+-	 * that is, it has a relative path, and the relative path does not
+-	 * appear to backtrack outside the source filesystem using "..".
+-	 *
+-	 * This test function evaluates the path for symlinks - that is it
+-	 * follows any symlinks (and any symlinks that it may contain etc.), to
+-	 * discover the canonicalised relative path.
+-	 *
+-	 * This is expensive, if possible consider using the faster
+-	 * contained() alternative which does not try to follow symlinks
+-	 *
+-	 * contained_followlink operates on symlinks only, other files by
+-	 * definition are contained within the source filesystem.
+-	 */
+-	if (!file_type_match(action_data->buf->st_mode, ACTION_LNK))
+-		return 1;
+-
+-	/* if nonstandard_pathname is set, then this is a symlink entered on the
+-	 * command line, this by definition is a dangling symlink */
+-	if(action_data->dir_ent->nonstandard_pathname)
+-		return 0;
+-
+-	/* if access() returns error then the symlink cannot be dereferenced
+-	 * for some reason, and it is pointless walking the symlink because it
+-	 * will fail.  This also deals with cases where a symbolic link is
+-	 * circular, generating -ELOOP, and so we don't have to worry about
+-	 * dealing with loops ourselves */
+-	if(access(action_data->pathname, F_OK) == -1)
+-		return 0;
+-
+-	bytes = readlink(action_data->pathname, buff, 65536);
+-	if(bytes < 1 || bytes == 65536)
+-		/* reading symlink failed or (unlikely) the symlink was longer
+-		 * than the implementation limit. This will be flagged up and
+-		 * dealt with later in Mksquashfs, and so here just return
+-		 * FALSE */
+-		return 0;
+-
+-	if (buff[0] == '/')
+-		/* absolute symlinks are not contained within the source
+-		 * filesystem */
+-		return 0;
+-
+-	/* readlink doesn't 0 terminate the returned path */
+-	buff[bytes] = '\0';
+-
+-	/* the symlink is relative to the parent directory */
+-	parent = action_data->dir_ent->our_dir->pathname;
+-
+-	return follow_link(parent, buff, action_data->depth);
+-}
+-
+-
+ static int parse_stat_arg(struct test_entry *test, struct atom *atom)
+ {
+ 	/* Call parse_expr to parse argument, which should be an expression */
+@@ -2802,8 +2596,6 @@ static struct test_entry test_table[] = {
+ 	{ "exec", 1, exec_fn, NULL, 1},
+ 	{ "exists", 0, exists_fn, NULL, 0},
+ 	{ "absolute", 0, absolute_fn, NULL, 0},
+-	{ "contained", 0, contained_fn, NULL, 1},
+-	{ "contained_followlink", 0, contained_followlink_fn, NULL, 1},
+ 	{ "stat", 1, stat_fn, parse_stat_arg, 1},
+ 	{ "", -1 }
+ };
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index 423040b..a103939 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -5080,7 +5080,7 @@ void calculate_queue_sizes(int mem, int *readq, int *fragq, int *bwriteq,
+ 
+ 
+ #define VERSION() \
+-	printf("mksquashfs version 4.3-git (2014/07/26)\n");\
++	printf("mksquashfs version 4.3-git (2014/07/29)\n");\
+ 	printf("copyright (C) 2014 Phillip Lougher "\
+ 		"<phillip@squashfs.org.uk>\n\n"); \
+ 	printf("This program is free software; you can redistribute it and/or"\
+-- 
+2.8.3
+

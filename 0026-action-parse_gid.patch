@@ -1,0 +1,28 @@
+From 2c4aa7347e84125d18bb537bd0246ae3a5f29d9d Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Sun, 3 Aug 2014 23:26:07 +0100
+Subject: [PATCH 026/120] action: parse_gid()
+
+Name should be group in syntax error message.
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/action.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/squashfs-tools/action.c b/squashfs-tools/action.c
+index c624905..9d62f82 100644
+--- a/squashfs-tools/action.c
++++ b/squashfs-tools/action.c
+@@ -865,7 +865,7 @@ static long long parse_gid(char *arg) {
+ 		if (group)
+ 			gid = group->gr_gid;
+ 		else {
+-			SYNTAX_ERROR("action: invalid gid or unknown user\n");
++			SYNTAX_ERROR("action: invalid gid or unknown group\n");
+ 			return -1;
+ 		}
+ 	}
+-- 
+2.8.3
+

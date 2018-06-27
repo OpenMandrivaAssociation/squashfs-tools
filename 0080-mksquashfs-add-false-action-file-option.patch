@@ -1,0 +1,61 @@
+From 81c0be5728200e0ddcb01f0cb74b8a44fb9fcc5e Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Wed, 27 Aug 2014 06:32:11 +0100
+Subject: [PATCH 080/120] mksquashfs: add -false-action-file option
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/action.c     |  8 ++++++++
+ squashfs-tools/mksquashfs.c | 10 ++++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/squashfs-tools/action.c b/squashfs-tools/action.c
+index 49b8d20..219df2e 100644
+--- a/squashfs-tools/action.c
++++ b/squashfs-tools/action.c
+@@ -801,6 +801,12 @@ int parse_action_true(char *s)
+ }
+ 
+ 
++int parse_action_false(char *s)
++{
++	return parse_action(s, ACTION_LOG_FALSE);
++}
++
++
+ int parse_action_verbose(char *s)
+ {
+ 	return parse_action(s, ACTION_LOG_VERBOSE);
+@@ -818,6 +824,8 @@ int read_action_file(char *filename, int verbose)
+ 	switch(verbose) {
+ 	case ACTION_LOG_TRUE:
+ 		return read_file(filename, "action", parse_action_true);
++	case ACTION_LOG_FALSE:
++		return read_file(filename, "action", parse_action_false);
+ 	case ACTION_LOG_VERBOSE:
+ 		return read_file(filename, "action", parse_action_verbose);
+ 	default:
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index 607d70c..84fa545 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -5260,6 +5260,16 @@ int main(int argc, char *argv[])
+ 			if(read_action_file(argv[i], ACTION_LOG_TRUE) == FALSE)
+ 				exit(1);
+ 
++		} else if(strcmp(argv[i], "-false-action-file") == 0 ||
++				strcmp(argv[i], "-faf") ==0) {
++			if(++i == argc) {
++				ERROR("%s: %s missing filename\n", argv[0],
++							argv[i - 1]);
++				exit(1);
++			}
++			if(read_action_file(argv[i], ACTION_LOG_FALSE) == FALSE)
++				exit(1);
++
+ 		} else if(strcmp(argv[i], "-comp") == 0)
+ 			/* parsed previously */
+ 			i++;
+-- 
+2.8.3
+

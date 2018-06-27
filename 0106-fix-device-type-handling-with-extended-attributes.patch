@@ -1,0 +1,33 @@
+From d47b13874e17a9a9faa7840f04e1069ce29debf1 Mon Sep 17 00:00:00 2001
+From: "Pranay Kr. Srivastava" <pranaykumar.srivastava@cognizant.com>
+Date: Wed, 22 Jul 2015 11:56:27 +0530
+Subject: [PATCH 106/120] fix device type handling with extended attributes
+
+If character device files have extended attributes then
+unsquashfs will incorrectly create them as block
+device files. This patch checks if the file is character
+device file in case it has extended attributes.
+---
+ squashfs-tools/unsquashfs.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/squashfs-tools/unsquashfs.c b/squashfs-tools/unsquashfs.c
+index a5f0117..d08d731 100644
+--- a/squashfs-tools/unsquashfs.c
++++ b/squashfs-tools/unsquashfs.c
+@@ -1117,7 +1117,11 @@ int create_inode(char *pathname, struct inode *i)
+ 	 	case SQUASHFS_CHRDEV_TYPE:
+  		case SQUASHFS_LBLKDEV_TYPE:
+ 	 	case SQUASHFS_LCHRDEV_TYPE: {
+-			int chrdev = i->type == SQUASHFS_CHRDEV_TYPE;
++			int chrdev = 0;
++			if ( i->type == SQUASHFS_CHRDEV_TYPE ||
++					i->type == SQUASHFS_LCHRDEV_TYPE)
++				chrdev = 1;
++
+ 			TRACE("create_inode: dev, rdev 0x%llx\n", i->data);
+ 
+ 			if(root_process) {
+-- 
+2.8.3
+

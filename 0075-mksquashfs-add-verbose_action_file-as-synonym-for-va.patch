@@ -1,0 +1,32 @@
+From 2185ee5319652353571eda7437522c12927b091e Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Wed, 27 Aug 2014 05:58:31 +0100
+Subject: [PATCH 075/120] mksquashfs: add -verbose_action_file as synonym for
+ -vaf
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/mksquashfs.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index 7c4b6e3..a097f89 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -5240,9 +5240,11 @@ int main(int argc, char *argv[])
+ 			if(read_action_file(argv[i], 0) == FALSE)
+ 				exit(1);
+ 
+-		} else if(strcmp(argv[i], "-vaf") == 0) {
++		} else if(strcmp(argv[i], "-verbose_action_file") == 0 ||
++				strcmp(argv[i], "-vaf") ==0) {
+ 			if(++i == argc) {
+-				ERROR("%s: -vaf missing filename\n", argv[0]);
++				ERROR("%s: %s missing filename\n", argv[0],
++							argv[i - 1]);
+ 				exit(1);
+ 			}
+ 			if(read_action_file(argv[i], 1) == FALSE)
+-- 
+2.8.3
+

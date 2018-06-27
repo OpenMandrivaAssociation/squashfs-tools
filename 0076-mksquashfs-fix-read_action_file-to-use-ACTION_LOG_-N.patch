@@ -1,0 +1,36 @@
+From ca29803d285975485c6825af18433eff49de3aca Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Wed, 27 Aug 2014 06:01:10 +0100
+Subject: [PATCH 076/120] mksquashfs: fix read_action_file to use
+ ACTION_LOG_{NONE|VERBOSE}
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/mksquashfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index a097f89..599bcb3 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -5237,7 +5237,7 @@ int main(int argc, char *argv[])
+ 							argv[i - 1]);
+ 				exit(1);
+ 			}
+-			if(read_action_file(argv[i], 0) == FALSE)
++			if(read_action_file(argv[i], ACTION_LOG_NONE) == FALSE)
+ 				exit(1);
+ 
+ 		} else if(strcmp(argv[i], "-verbose_action_file") == 0 ||
+@@ -5247,7 +5247,7 @@ int main(int argc, char *argv[])
+ 							argv[i - 1]);
+ 				exit(1);
+ 			}
+-			if(read_action_file(argv[i], 1) == FALSE)
++			if(read_action_file(argv[i], ACTION_LOG_VERBOSE) == FALSE)
+ 				exit(1);
+ 
+ 		} else if(strcmp(argv[i], "-comp") == 0)
+-- 
+2.8.3
+

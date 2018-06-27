@@ -1,0 +1,181 @@
+From b193da1cf1e0f54878b224ad69e21d7eb2866b0f Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Fri, 5 Sep 2014 03:00:57 +0100
+Subject: [PATCH 090/120] actions: update test function parser to handle
+ variable amount of arguments
+
+Update the test function parser to handle variable amount of arguments,
+as that's now needed for the perm() test function.  Up till now, though
+updating the test parser has been a TODO, it been a low priority because
+it's done what's needed.
+
+Updating the parser to speculatively read the number of arguments
+present (and hence handle variable number of arguments) has been a
+TODO even without the need to handle a variable number of arguments
+because experience gained updating the action parser to do this showed
+it generates better syntax error messages.
+
+Previously the parser just parsed the number of arguments expected, and
+then quit.  The parser now parses all the arguments present, and then
+compares it against what was expected.
+
+No big deal?  Well guess what gives the better syntax error if you
+enter too many arguments.  Reading just the number of arguments
+expected, and then quitting, means the extra arguments cause to
+paraphrase a "I expected a ) here, and I got a comma or string".
+Now, you get an error message like "I got 5 arguments, but only
+expected 2".  Which IMHO is a better syntax error message.
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/action.c | 82 ++++++++++++++++++++++++++-----------------------
+ squashfs-tools/action.h |  1 +
+ 2 files changed, 44 insertions(+), 39 deletions(-)
+
+diff --git a/squashfs-tools/action.c b/squashfs-tools/action.c
+index 002d398..170d095 100644
+--- a/squashfs-tools/action.c
++++ b/squashfs-tools/action.c
+@@ -264,8 +264,8 @@ static struct expr *create_unary_op(struct expr *lhs, int op)
+ 
+ static struct expr *parse_test(char *name)
+ {
+-	char *string;
+-	int token;
++	char *string, **argv = NULL;
++	int token, args = 0;
+ 	int i;
+ 	struct test_entry *test;
+ 	struct expr *expr;
+@@ -295,55 +295,68 @@ static struct expr *parse_test(char *name)
+ 
+ 	expr->type = ATOM_TYPE;
+ 
+-	expr->atom.argv = malloc(test->args * sizeof(char *));
+-	if (expr->atom.argv == NULL)
+-		MEM_ERROR();
+-
+ 	expr->atom.test = test;
+ 	expr->atom.data = NULL;
+ 
+ 	/*
+-	 * If the test has no arguments, allow it to be typed
+-	 *  without brackets
++	 * If the test has no arguments, then go straight to checking if there's
++	 * enough arguments
+ 	 */
+-	if (test->args == 0) {
+-		token = peek_token(&string);
++	token = peek_token(&string);
+ 
+-		if (token != TOK_OPEN_BRACKET)
++	if (token != TOK_OPEN_BRACKET)
+ 			goto skip_args;
+-	}
+ 
+-	token = get_token(&string);
++	get_token(&string);
+ 
+-	if (token != TOK_OPEN_BRACKET) {
+-		SYNTAX_ERROR("Unexpected token \"%s\", expected \"(\"\n",
+-						TOK_TO_STR(token, string));
+-		goto failed;
+-	}
+-
+-	for (i = 0; i < test->args; i++) {
+-		token = get_token(&string);
++	/*
++	 * speculatively read all the arguments, and then see if the
++	 * number of arguments read is the number expected, this handles
++	 * tests with a variable number of arguments
++	 */
++	token = get_token(&string);
++	if (token == TOK_CLOSE_BRACKET)
++		goto skip_args;
+ 
++	while(1) {
+ 		if (token != TOK_STRING) {
+ 			SYNTAX_ERROR("Unexpected token \"%s\", expected "
+ 				"argument\n", TOK_TO_STR(token, string));
+ 			goto failed;
+ 		}
+ 
+-		expr->atom.argv[i] = strdup(string);
++		argv = realloc(argv, (args + 1) * sizeof(char *));
++		if (argv == NULL)
++			MEM_ERROR();
+ 
+-		if (i + 1 < test->args) {
+-			token = get_token(&string);
++		argv[args ++ ] = strdup(string);
+ 
+-			if (token != TOK_COMMA) {
+-				SYNTAX_ERROR("Unexpected token \"%s\", "
+-					"expected \",\"\n",
+-					TOK_TO_STR(token, string));
++		token = get_token(&string);
++
++		if (token == TOK_CLOSE_BRACKET)
++			break;
++
++		if (token != TOK_COMMA) {
++			SYNTAX_ERROR("Unexpected token \"%s\", expected "
++				"\",\" or \")\"\n", TOK_TO_STR(token, string));
+ 			goto failed;
+-			}
+ 		}
++		token = get_token(&string);
++	}
++
++skip_args:
++	/*
++	 * expected number of arguments?
++	 */
++	if(test->args != -2 && args != test->args) {
++		SYNTAX_ERROR("Unexpected number of arguments, expected %d, "
++			"got %d\n", test->args, args);
++		goto failed;
+ 	}
+ 
++	expr->atom.args = args;
++	expr->atom.argv = argv;
++
+ 	if (test->parse_args) {
+ 		int res = test->parse_args(test, &expr->atom);
+ 
+@@ -351,19 +364,10 @@ static struct expr *parse_test(char *name)
+ 			goto failed;
+ 	}
+ 
+-	token = get_token(&string);
+-
+-	if (token != TOK_CLOSE_BRACKET) {
+-		SYNTAX_ERROR("Unexpected token \"%s\", expected \")\"\n",
+-						TOK_TO_STR(token, string));
+-		goto failed;
+-	}
+-
+-skip_args:
+ 	return expr;
+ 
+ failed:
+-	free(expr->atom.argv);
++	free(argv);
+ 	free(expr);
+ 	return NULL;
+ }
+diff --git a/squashfs-tools/action.h b/squashfs-tools/action.h
+index e1be949..9498549 100644
+--- a/squashfs-tools/action.h
++++ b/squashfs-tools/action.h
+@@ -98,6 +98,7 @@ struct expr_op {
+ 
+ struct atom {
+ 	struct test_entry *test;
++	int args;
+ 	char **argv;
+ 	void *data;
+ };
+-- 
+2.8.3
+

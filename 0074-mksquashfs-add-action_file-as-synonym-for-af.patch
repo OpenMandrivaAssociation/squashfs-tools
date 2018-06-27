@@ -1,0 +1,31 @@
+From c6127379056cc81b60b7c72d6fa4a692b6bb7363 Mon Sep 17 00:00:00 2001
+From: Phillip Lougher <phillip@squashfs.org.uk>
+Date: Wed, 27 Aug 2014 05:56:13 +0100
+Subject: [PATCH 074/120] mksquashfs: add -action_file as synonym for -af
+
+Signed-off-by: Phillip Lougher <phillip@squashfs.org.uk>
+---
+ squashfs-tools/mksquashfs.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/squashfs-tools/mksquashfs.c b/squashfs-tools/mksquashfs.c
+index 4ee45b1..7c4b6e3 100644
+--- a/squashfs-tools/mksquashfs.c
++++ b/squashfs-tools/mksquashfs.c
+@@ -5230,9 +5230,11 @@ int main(int argc, char *argv[])
+ 			if(res == 0)
+ 				exit(1);
+ 
+-		} else if(strcmp(argv[i], "-af") == 0) {
++		} else if(strcmp(argv[i], "-action_file") == 0 ||
++				strcmp(argv[i], "-af") ==0) {
+ 			if(++i == argc) {
+-				ERROR("%s: -af missing filename\n", argv[0]);
++				ERROR("%s: %s missing filename\n", argv[0],
++							argv[i - 1]);
+ 				exit(1);
+ 			}
+ 			if(read_action_file(argv[i], 0) == FALSE)
+-- 
+2.8.3
+
