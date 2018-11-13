@@ -3,7 +3,7 @@
 
 Name:		%{oname}-tools
 Version:	4.3
-Release:	14
+Release:	15
 Summary:	Utilities for the creation of compressed squashfs images
 License:	GPLv2+
 Group:		File tools
@@ -103,6 +103,8 @@ Patch117:	0117-mksquashfs-add-pseudo-definition-format-to-the-help-.patch
 Patch118:	0118-pseudo.c-Fix-pseudo-format-error-message.patch
 Patch119:	0119-mksquashfs-Make-all-compressor-functions-static.patch
 Patch120:	0120-squashfs-tools-Add-zstd-support.patch
+# And our own patches...
+Patch200:	squashfs-4.3-glibc-2.28.patch
 
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:	attr-devel
