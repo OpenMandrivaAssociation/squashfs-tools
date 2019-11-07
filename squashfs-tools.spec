@@ -22,8 +22,7 @@ squashfs-tools are utilities for the creation
 of compressed squashfs images.
 
 %prep
-%setup -q -n %{oname}%{version}
-%apply_patches
+%autosetup -n %{oname}%{version} -p1
 
 %build
 %setup_compile_flags
@@ -31,7 +30,7 @@ of compressed squashfs images.
 cd squashfs-tools
 # Using BFD ld is a workaround for mksquashfs and unsquashfs getting the
 # same build ID with gold
-%make -j1 ZSTD_SUPPORT=1 XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=1 COMP_DEFAULT=zstd EXTRA_CFLAGS="%{optflags}"
+%make_build -j1 ZSTD_SUPPORT=1 XZ_SUPPORT=1 LZO_SUPPORT=1 LZ4_SUPPORT=1 COMP_DEFAULT=zstd EXTRA_CFLAGS="%{optflags}"
 
 %install
 install -m755 squashfs-tools/mksquashfs -D %{buildroot}%{_bindir}/mksquashfs
