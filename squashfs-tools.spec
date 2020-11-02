@@ -3,13 +3,13 @@
 
 Name:		%{oname}-tools
 Version:	4.4
-Release:	2
+Release:	3
 Summary:	Utilities for the creation of compressed squashfs images
 License:	GPLv2+
 Group:		File tools
 URL:		http://squashfs.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/project/squashfs/squashfs/squashfs%{version}/%{oname}%{version}.tar.gz
-
+Patch0:	0001-squashfs-tools-fix-build-failure-against-gcc-10.patch
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:	attr-devel
 BuildRequires:	pkgconfig(liblzma)
