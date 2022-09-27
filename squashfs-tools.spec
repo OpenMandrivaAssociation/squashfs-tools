@@ -2,13 +2,13 @@
 %define _disable_ld_no_undefined 1
 
 Name:		%{oname}-tools
-Version:	4.5
+Version:	4.5.1
 Release:	1
 Summary:	Utilities for the creation of compressed squashfs images
 License:	GPLv2+
 Group:		File tools
 URL:		https://github.com/plougher/squashfs-tools
-Source0:	https://github.com/plougher/squashfs-tools/archive/%{oname}%{version}.tar.gz
+Source0:	https://github.com/plougher/squashfs-tools/archive/refs/tags/%{version}.tar.gz
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:	pkgconfig(libattr)
 BuildRequires:	pkgconfig(liblzma)
