@@ -2,8 +2,8 @@
 %define _disable_ld_no_undefined 1
 
 Name:		%{oname}-tools
-Version:	4.5.1
-Release:	2
+Version:	4.6.1
+Release:	1
 Summary:	Utilities for the creation of compressed squashfs images
 License:	GPLv2+
 Group:		File tools
