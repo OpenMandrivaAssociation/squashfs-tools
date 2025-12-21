@@ -9,6 +9,7 @@ License:	GPLv2+
 Group:		File tools
 URL:		https://github.com/plougher/squashfs-tools
 Source0:	https://github.com/plougher/squashfs-tools/archive/refs/tags/%{version}.tar.gz
+BuildRequires:	make
 BuildRequires:	pkgconfig(zlib)
 BuildRequires:	pkgconfig(libattr)
 BuildRequires:	pkgconfig(liblzma)
